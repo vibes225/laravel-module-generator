@@ -14,7 +14,14 @@ final readonly class GenerationSettings
         public int $laravelMajor = 13,
         public string $modelsNamespace = 'App\Models',
         public DateTimeImmutable $now = new DateTimeImmutable('2026-01-01 00:00:00'),
+        public ?string $pagesPath = null,
     ) {}
+
+    /** Dossier racine des pages : `pages_path` si configuré, sinon celui de la convention. */
+    public function pagesRoot(): string
+    {
+        return rtrim($this->pagesPath ?? ($this->isStarterKit() ? 'resources/js/pages' : 'resources/js/Pages'), '/');
+    }
 
     public function isStarterKit(): bool
     {

@@ -15,8 +15,6 @@ use Illuminate\Support\Str;
 /** Pages Inertia React (JSX) : Index, Create, Edit, Show et le formulaire partagé. N'utilisent que le kit publié. */
 final class PageGenerator implements Generator
 {
-    private const KIT = 'components/admin';
-
     public function applies(GenerationContext $context): bool
     {
         return true;
@@ -35,21 +33,15 @@ final class PageGenerator implements Generator
             $files[] = new PlannedFile($names->pagePath('Show'), $this->show($context), 'page', 'Page fiche');
         }
 
-        $files[] = new PlannedFile($names->formPath(), (new FormBuilder)->build($context, $this->kitPath(2)), 'component', 'Formulaire');
+        $files[] = new PlannedFile($names->formPath(), (new FormBuilder)->build($context, $context->names->kitImport(fromPartials: true)), 'component', 'Formulaire');
 
         return $files;
-    }
-
-    /** Chemin relatif vers le kit depuis `resources/js/<pages>/<Module>` (+ sous-dossiers). */
-    private function kitPath(int $depth): string
-    {
-        return str_repeat('../', $depth + 1).self::KIT;
     }
 
     private function simplePage(GenerationContext $context, string $stub): string
     {
         return $context->render('pages/'.$stub, [
-            'KIT_PATH' => $this->kitPath(1),
+            'KIT_PATH' => $context->names->kitImport(),
             'FORM' => Str::studly($context->names->formComponent),
             'TITLE' => Escaper::js($context->definition->name),
             'ROUTE' => $context->names->routeName,
@@ -84,7 +76,7 @@ final class PageGenerator implements Generator
         return $context->render('pages/index', [
             'ICONS' => $pair ? 'Plus, Trash2' : 'Eye, Pencil, Plus, Trash2',
             'KIT' => Code::indent(implode("\n", array_map(fn (string $name) => $name.',', self::sortImports($kit))), 1),
-            'KIT_PATH' => $this->kitPath(1),
+            'KIT_PATH' => $context->names->kitImport(),
             'TITLE' => Escaper::js($definition->name),
             'HELPERS' => $definition->tree
                 ? "\n    const indent = (row) => (filters.sort === '_lft' && !filters.search ? `\${(row.depth ?? 0) * 1.5}rem` : 0);\n"
@@ -118,7 +110,7 @@ final class PageGenerator implements Generator
 
         return $context->render('pages/show', [
             'KIT' => implode(', ', self::sortImports(['AdminLayout', 'Button', ...$columns->imports()])),
-            'KIT_PATH' => $this->kitPath(1),
+            'KIT_PATH' => $context->names->kitImport(),
             'TITLE' => Escaper::js($definition->name),
             'RECORD_TITLE' => $title === 'id' ? '`${TITLE} #${record.id}`' : "record.{$title} ?? TITLE",
             'ROUTE' => $context->names->routeName,

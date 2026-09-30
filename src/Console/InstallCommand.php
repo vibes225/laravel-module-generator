@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Amon\ModuleGenerator\Console;
 
 use Amon\ModuleGenerator\Console\Concerns\PrintsPlans;
+use Amon\ModuleGenerator\Generation\GenerationSettings;
 use Amon\ModuleGenerator\Install\Installer;
 use Amon\ModuleGenerator\Install\InstallPlan;
 use Illuminate\Console\Command;
@@ -29,7 +30,8 @@ final class InstallCommand extends Command
             return self::FAILURE;
         }
 
-        $installer = new Installer(base_path(), dirname(__DIR__, 2).'/scaffold', (string) config('module-generator.convention', 'breeze'));
+        $settings = new GenerationSettings((string) config('module-generator.convention', 'breeze'), pagesPath: config('module-generator.pages_path'));
+        $installer = new Installer(base_path(), dirname(__DIR__, 2).'/scaffold', $settings->pagesRoot());
         $plan = $installer->plan();
 
         $this->components->info('Échafaudage (appartient au projet, jamais écrasé) :');
@@ -48,11 +50,11 @@ final class InstallCommand extends Command
         }
 
         foreach ($plan->warnings as $warning) {
-            $this->components->warn($warning);
+            $this->printBlock('warn', $warning);
         }
 
         foreach ($plan->commands as $command) {
-            $this->components->warn("Dépendance manquante : {$command}");
+            $this->printBlock('warn', "Dépendance manquante, à lancer :\n    {$command}");
         }
 
         if ($dryRun) {

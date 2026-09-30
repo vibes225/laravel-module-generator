@@ -25,6 +25,13 @@ return [
     'convention' => 'breeze',
 
     /*
+    | Dossier racine des pages générées (null : celui de la convention).
+    | Exemple : 'resources/js/pages' pour garder le nommage Breeze dans le
+    | dossier en minuscules du starter kit officiel.
+    */
+    'pages_path' => null,
+
+    /*
     |--------------------------------------------------------------------------
     | Nommage
     |--------------------------------------------------------------------------

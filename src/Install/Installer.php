@@ -30,7 +30,7 @@ final class Installer
     public function __construct(
         private readonly string $basePath,
         private readonly string $scaffoldPath,
-        private readonly string $convention = 'breeze',
+        private readonly string $pagesRoot = 'resources/js/Pages',
     ) {}
 
     public function plan(): InstallPlan
@@ -155,7 +155,7 @@ final class Installer
     private function warnings(): array
     {
         $warnings = [];
-        $directory = $this->convention === 'starter-kit' ? 'pages' : 'Pages';
+        $directory = str_starts_with($this->pagesRoot, 'resources/js/') ? substr($this->pagesRoot, 13) : $this->pagesRoot;
         $entry = null;
 
         foreach (['resources/js/app.jsx', 'resources/js/app.js', 'resources/js/app.tsx', 'resources/js/app.ts'] as $candidate) {
@@ -168,9 +168,17 @@ final class Installer
         if ($entry === null) {
             $warnings[] = 'Point d\'entrée Inertia introuvable (resources/js/app.jsx).';
         } elseif (! str_contains((string) file_get_contents($this->path($entry)), '.jsx')) {
-            $warnings[] = "Le résolveur de pages de {$entry} doit accepter les fichiers .jsx, par exemple :\n"
-                ."    const pages = import.meta.glob('./{$directory}/**/*.jsx');\n"
-                ."    resolve: (name) => pages[`./{$directory}/\${name}.jsx`](),";
+            // Projet TypeScript (starter kit) : on garde les pages .tsx existantes et on ajoute les .jsx générées.
+            $warnings[] = str_ends_with($entry, 'ts') || str_ends_with($entry, 'tsx')
+                ? "Le résolveur de pages de {$entry} doit accepter aussi les fichiers .jsx, par exemple :\n"
+                    ."    resolve: (name) => {\n"
+                    ."        const pages = import.meta.glob(['./{$directory}/**/*.tsx', './{$directory}/**/*.jsx']);\n"
+                    ."        const page = pages[`./{$directory}/\${name}.tsx`] ?? pages[`./{$directory}/\${name}.jsx`];\n\n"
+                    ."        return page();\n"
+                    .'    },'
+                : "Le résolveur de pages de {$entry} doit accepter les fichiers .jsx, par exemple :\n"
+                    ."    const pages = import.meta.glob('./{$directory}/**/*.jsx');\n"
+                    ."    resolve: (name) => pages[`./{$directory}/\${name}.jsx`](),";
         }
 
         $view = $this->path('resources/views/app.blade.php');

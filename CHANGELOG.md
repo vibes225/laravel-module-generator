@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.1.0 (2026-09-30)
+
+- Option `pages_path` : dossier racine des pages, indépendant de la convention (ex. nommage Breeze dans
+  `resources/js/pages` d'un projet basé sur le starter kit officiel).
+- Imports du kit UI calculés selon l'emplacement réel des pages.
+- Installation : résolveur mixte `.tsx` + `.jsx` proposé pour un point d'entrée TypeScript.
+- Console : les commandes à lancer sont affichées sans ponctuation ajoutée.
+
 ## 1.0.0 (2026-09-30)
 
 Première version.

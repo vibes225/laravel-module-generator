@@ -89,3 +89,16 @@ it('détecte une migration existante pour la même table', function () {
 
     expect(array_keys($plan->conflicts))->toContain('database/migrations/2026_09_30_100000_create_clients_table.php');
 });
+
+it('range les pages dans pages_path en gardant le nommage de la convention', function () {
+    $definition = definitionFactory()->make(clientInput(['singular' => 'Client contact']));
+    $names = new ModuleNames($definition, new GenerationSettings('breeze', pagesPath: 'resources/js/pages'));
+    $deep = new ModuleNames($definition, new GenerationSettings('breeze', pagesPath: 'resources/js/admin/pages/'));
+
+    expect($names->pagePath('Index'))->toBe('resources/js/pages/ClientContacts/Index.jsx')
+        ->and($names->page('Index'))->toBe('ClientContacts/Index')
+        ->and($names->kitImport())->toBe('../../components/admin')
+        ->and($names->kitImport(fromPartials: true))->toBe('../../../components/admin')
+        ->and($deep->pagePath('Index'))->toBe('resources/js/admin/pages/ClientContacts/Index.jsx')
+        ->and($deep->kitImport())->toBe('../../../components/admin');
+});

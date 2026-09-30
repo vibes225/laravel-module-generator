@@ -42,8 +42,25 @@ trait PrintsPlans
         }
 
         foreach ($plan->missing as $command) {
-            $this->components->error("Prérequis manquant, lancer : {$command}");
+            $this->printBlock('error', "Prérequis manquant, à lancer :\n    {$command}");
         }
+    }
+
+    /**
+     * Message dont la première ligne passe par les composants de la console et le reste (code, commande) tel quel,
+     * pour ne pas y ajouter de ponctuation.
+     */
+    protected function printBlock(string $style, string $message): void
+    {
+        $lines = explode("\n", $message);
+        $first = array_shift($lines);
+        $this->components->{$style}($lines === [] ? $first : rtrim($first, ' :').' :');
+
+        foreach ($lines as $line) {
+            $this->line($line);
+        }
+
+        $this->newLine();
     }
 
     /** @param  array<string, list<string>>  $errors */

@@ -113,6 +113,15 @@ Supprimer un module = supprimer les fichiers de son manifest, rien d'autre : la 
 `migrate:rollback` avant si nécessaire) et aucune référence n'est recherchée. Les fichiers modifiés depuis la
 génération ne sont supprimés que sur demande explicite ; les dossiers vides créés par le module sont retirés.
 
+## Projet basé sur le starter kit officiel (TypeScript)
+
+Le starter kit React de Laravel est en TypeScript ; les modules générés sont en JSX et cohabitent avec lui :
+
+1. `config/module-generator.php` : `'pages_path' => 'resources/js/pages'` (nommage Breeze conservé dans le dossier du kit),
+   ou `'convention' => 'starter-kit'` (nommage en minuscules) ;
+2. faire accepter les `.jsx` au résolveur de `resources/js/app.tsx` (l'installation affiche le code à utiliser) ;
+3. ajouter `@routes` (Ziggy) dans `resources/views/app.blade.php`.
+
 ## Interface web
 
 En environnement `local`, l'outil est disponible sur `/module-generator` : liste des modules, constructeur avec options
@@ -126,6 +135,7 @@ Vite de votre projet. Réglages : `module-generator.ui` (`enabled`, `prefix`, `m
 | Clé | Défaut | Rôle |
 |---|---|---|
 | `convention` | `breeze` | `resources/js/Pages/Invoices/Index.jsx` ; `starter-kit` : `resources/js/pages/invoices/index.jsx` |
+| `pages_path` | `null` | dossier racine des pages (sinon celui de la convention), ex. `resources/js/pages` |
 | `naming.french_plural` | `false` | pluriel français des tables et slugs (sinon pluriel anglais de Laravel) |
 | `naming.models_namespace` | `App\Models` | espace de noms des modèles |
 | `format.pint` / `format.prettier` | `true` / `false` | formatage des fichiers générés (empreintes calculées après) |

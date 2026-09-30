@@ -83,3 +83,13 @@ it('signale les vérifications et dépendances manquantes sans rien corriger', f
             'npm install react react-dom @inertiajs/react lucide-react',
         ]);
 });
+
+it('propose un résolveur adapté au dossier des pages configuré', function () {
+    $base = hostProject();
+    file_put_contents($base.'/resources/js/app.tsx', "resolve: (name) => resolvePageComponent(`./pages/\${name}.tsx`, import.meta.glob('./pages/**/*.tsx')),\n");
+    unlink($base.'/resources/js/app.jsx');
+
+    $plan = (new Installer($base, dirname(__DIR__, 3).'/scaffold', 'resources/js/pages'))->plan();
+
+    expect($plan->warnings[0])->toContain('app.tsx')->toContain("import.meta.glob(['./pages/**/*.tsx', './pages/**/*.jsx'])");
+});

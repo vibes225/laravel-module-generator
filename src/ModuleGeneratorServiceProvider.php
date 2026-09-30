@@ -98,6 +98,7 @@ class ModuleGeneratorServiceProvider extends ServiceProvider
                 LaravelVersion::major($app->version()),
                 (string) $app['config']->get('module-generator.naming.models_namespace', 'App\Models'),
                 Date::now()->toDateTimeImmutable(),
+                $app['config']->get('module-generator.pages_path'),
             ),
             new Remover(base_path(), $app->make(ManifestRepository::class)),
         ));

@@ -61,11 +61,11 @@ final readonly class ModuleNames
         $studly = Str::studly(str_replace('-', '_', $definition->slug));
 
         if ($settings->isStarterKit()) {
-            $this->pagesDirectory = 'resources/js/pages/'.$definition->slug;
+            $this->pagesDirectory = $settings->pagesRoot().'/'.$definition->slug;
             $this->componentPrefix = $definition->slug;
             $this->formComponent = Str::kebab($definition->model).'-form';
         } else {
-            $this->pagesDirectory = 'resources/js/Pages/'.$studly;
+            $this->pagesDirectory = $settings->pagesRoot().'/'.$studly;
             $this->componentPrefix = $studly;
             $this->formComponent = $definition->model.'Form';
         }
@@ -85,6 +85,20 @@ final readonly class ModuleNames
     public function formPath(): string
     {
         return $this->pagesDirectory.'/partials/'.$this->formComponent.'.jsx';
+    }
+
+    /** Import relatif du kit UI (`resources/js/components/admin`) depuis les pages ou le dossier partials. */
+    public function kitImport(bool $fromPartials = false): string
+    {
+        $from = explode('/', $this->pagesDirectory.($fromPartials ? '/partials' : ''));
+        $to = ['resources', 'js', 'components', 'admin'];
+
+        while ($from !== [] && $to !== [] && $from[0] === $to[0]) {
+            array_shift($from);
+            array_shift($to);
+        }
+
+        return str_repeat('../', count($from)).implode('/', $to);
     }
 
     public function modelPath(): string
