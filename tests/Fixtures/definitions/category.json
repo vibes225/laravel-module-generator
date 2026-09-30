@@ -1,0 +1,2 @@
+{"singular":"Category","tree":true,"fields":[{"name":"name","type":"string"},{"name":"position","type":"integer","options":{"unsigned":true}},{"name":"cover","type":"image","nullable":true}],
+ "morph":{"name":"owner","nullable":true,"types":[{"model":"User"},{"model":"Client","display_column":"company"}]}}

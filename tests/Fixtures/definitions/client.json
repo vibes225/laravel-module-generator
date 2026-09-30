@@ -1,0 +1,1 @@
+{"singular":"Client","icon":"users","fields":[{"name":"name","type":"string"},{"name":"email","type":"email","unique":true},{"name":"vip","type":"boolean"},{"name":"status","type":"enum","default":"prospect","options":{"values":["prospect","active"]}}]}

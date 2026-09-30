@@ -13,6 +13,7 @@
         "inertiajs/inertia-laravel": "^3.0"
     },
     "require-dev": {
+        "kalnoy/nestedset": "^6.0.7|^7.0",
         "larastan/larastan": "^3.0",
         "laravel/pint": "^1.18",
         "orchestra/testbench": "^10.0|^11.0",

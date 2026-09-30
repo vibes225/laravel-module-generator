@@ -1,0 +1,1 @@
+{"kind":"pivot","singular":"Follow","model":"Follow","pivot":{"left":{"model":"User","foreign_key":"follower_id"},"right":{"model":"User","foreign_key":"followed_id"},"primary_id":false}}

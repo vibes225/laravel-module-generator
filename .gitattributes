@@ -6,3 +6,4 @@
 /vite.config.js export-ignore
 /phpstan.neon export-ignore
 /pint.json export-ignore
+/tests/Golden/** -text

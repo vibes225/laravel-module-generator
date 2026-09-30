@@ -1,0 +1,1 @@
+{"kind":"pivot","singular":"Client tag","pivot":{"left":{"model":"Client"},"right":{"model":"Tag"}},"fields":[{"name":"note","type":"string","nullable":true}]}

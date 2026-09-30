@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
 use Illuminate\Support\Facades\Artisan;
 use Inertia\Testing\AssertableInertia;
@@ -64,7 +65,7 @@ it('génère, refuse les conflits, puis supprime en protégeant les fichiers mod
 
 it('refuse la génération et la suppression en production', function () {
     $this->app['env'] = 'production';
-    $this->withoutMiddleware(ValidateCsrfToken::class);
+    $this->withoutMiddleware([ValidateCsrfToken::class, PreventRequestForgery::class]);
 
     $this->postJson('/module-generator/api/generate', ['definition' => invoiceDefinition()])->assertForbidden();
     $this->deleteJson('/module-generator/api/modules/invoices')->assertForbidden();

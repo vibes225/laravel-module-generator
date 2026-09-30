@@ -1,0 +1,1 @@
+{"kind":"pivot","singular":"Taggable","pivot":{"left":{"polymorphic":true},"right":{"model":"Tag"}},"morph":{"name":"taggable","types":[{"model":"Post"},{"model":"Video","display_column":"title"}]}}

@@ -1,0 +1,1 @@
+{"singular":"Invoice","fields":[{"name":"number","type":"string","unique":true},{"name":"status","type":"enum","default":"draft","options":{"values":["draft","paid"]}},{"name":"amount","type":"decimal"},{"name":"attachment","type":"file","nullable":true},{"name":"meta","type":"json","nullable":true}],"relations":[{"type":"belongsTo","target":"Client"}]}

@@ -1,0 +1,8 @@
+{"singular":"Invoice","icon":"file-text","options":{"soft_deletes":false},
+ "fields":[{"name":"number","type":"string","unique":true},
+  {"name":"status","type":"enum","default":"draft","filterable":true,"options":{"values":["draft","sent","paid"]}},
+  {"name":"amount","type":"decimal"},{"name":"issued_at","type":"date"},
+  {"name":"attachment","type":"file","nullable":true},{"name":"is_paid","type":"boolean"},
+  {"name":"secret","type":"password"},{"name":"meta","type":"json","nullable":true},{"name":"notes","type":"text","nullable":true}],
+ "relations":[{"type":"belongsTo","target":"Client"},{"type":"hasMany","target":"InvoiceLine","name":"lines"},
+  {"type":"belongsToMany","target":"Tag","in_form":true,"pivot":{"mode":"generate","timestamps":true}}]}

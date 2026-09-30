@@ -12,22 +12,23 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { laravel: 12, php: '8.2', testbench: '^10.0' }
-          - { laravel: 12, php: '8.3', testbench: '^10.0' }
-          - { laravel: 12, php: '8.4', testbench: '^10.0' }
-          - { laravel: 13, php: '8.3', testbench: '^11.0' }
-          - { laravel: 13, php: '8.4', testbench: '^11.0' }
+          - { laravel: 12, php: '8.2', testbench: '^10.0', nestedset: '^6.0.7' }
+          - { laravel: 12, php: '8.3', testbench: '^10.0', nestedset: '^6.0.7' }
+          - { laravel: 12, php: '8.4', testbench: '^10.0', nestedset: '^6.0.7' }
+          - { laravel: 13, php: '8.3', testbench: '^11.0', nestedset: '^7.0' }
+          - { laravel: 13, php: '8.4', testbench: '^11.0', nestedset: '^7.0' }
     steps:
       - uses: actions/checkout@v4
       - uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
+          extensions: pdo_sqlite, fileinfo
           coverage: none
       - name: Installer les dépendances
         run: |
-          composer require "laravel/framework:^${{ matrix.laravel }}.0" "orchestra/testbench:${{ matrix.testbench }}" --dev --no-interaction --no-update
+          composer require "laravel/framework:^${{ matrix.laravel }}.0" "orchestra/testbench:${{ matrix.testbench }}" "kalnoy/nestedset:${{ matrix.nestedset }}" --dev --no-interaction --no-update
           composer update --prefer-dist --no-interaction
-      - name: Tests
+      - name: Tests (unitaires, golden files, CRUD généré, architecture)
         run: vendor/bin/pest
 
   quality:
@@ -42,3 +43,31 @@ jobs:
       - run: composer update --prefer-dist --no-interaction
       - run: vendor/bin/pint --test
       - run: vendor/bin/phpstan analyse --memory-limit=1G
+
+  interface:
+    runs-on: ubuntu-latest
+    name: Interface de l'outil (dist/ à jour)
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install --no-audit --no-fund
+      - run: npm run build
+      - name: dist/ doit correspondre aux sources
+        run: git diff --exit-code -- dist
+
+  playground:
+    runs-on: ubuntu-latest
+    name: Playground (vite build + ESLint sur le JSX généré)
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: pdo_sqlite, fileinfo
+          coverage: none
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: .github/playground/run.sh
