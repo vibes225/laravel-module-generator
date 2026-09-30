@@ -28,11 +28,13 @@ return [
     |--------------------------------------------------------------------------
     | Nommage
     |--------------------------------------------------------------------------
-    | Pluralisation française pour les noms de table et de slug dérivés.
+    | Pluriel des noms de table et de slug dérivés : anglais par défaut, français si french_plural est vrai.
     | Ces noms restent modifiables dans la définition du module.
     */
     'naming' => [
-        'french_plural' => true,
+        'french_plural' => false,
+        // Espace de noms des modèles de l'hôte (relations, types polymorphes).
+        'models_namespace' => 'App\Models',
     ],
 
     /*

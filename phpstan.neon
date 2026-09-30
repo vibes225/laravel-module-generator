@@ -5,3 +5,6 @@ parameters:
     level: 5
     paths:
         - src
+    # Le volume D: (non NTFS) refuse les workers parallèles de PHPStan.
+    parallel:
+        maximumNumberOfProcesses: 1

@@ -5,7 +5,7 @@ use Illuminate\Support\ServiceProvider;
 
 it('fusionne la configuration par défaut', function () {
     expect(config('module-generator.convention'))->toBe('breeze')
-        ->and(config('module-generator.naming.french_plural'))->toBeTrue()
+        ->and(config('module-generator.naming.french_plural'))->toBeFalse()
         ->and(config('module-generator.format.prettier'))->toBeFalse();
 });
 
