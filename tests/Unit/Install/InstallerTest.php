@@ -93,3 +93,16 @@ it('propose un résolveur adapté au dossier des pages configuré', function () 
 
     expect($plan->warnings[0])->toContain('app.tsx')->toContain("import.meta.glob(['./pages/**/*.tsx', './pages/**/*.jsx'])");
 });
+
+it('reconnaît le plugin @inertiajs/vite et signale le callback layout', function () {
+    $base = hostProject();
+    unlink($base.'/resources/js/app.jsx');
+    file_put_contents($base.'/resources/js/app.tsx', "void createInertiaApp({\n    layout: (name) => AppLayout,\n});\n");
+    $npm = json_decode(file_get_contents($base.'/package.json'), true);
+    $npm['devDependencies']['@inertiajs/vite'] = '^3.0';
+    file_put_contents($base.'/package.json', json_encode($npm));
+
+    $warnings = installer($base)->plan()->warnings;
+
+    expect($warnings)->toHaveCount(1)->and($warnings[0])->toContain('callback layout')->toContain('/^[A-Z]/.test(name)');
+});

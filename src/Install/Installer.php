@@ -165,9 +165,14 @@ final class Installer
             }
         }
 
+        $npm = json_decode((string) @file_get_contents($this->path('package.json')), true);
+        // Inertia v3 : le plugin @inertiajs/vite résout lui-même les pages (.tsx puis .jsx, dossiers pages/ et Pages/).
+        $vitePlugin = isset($npm['dependencies']['@inertiajs/vite']) || isset($npm['devDependencies']['@inertiajs/vite']);
+        $source = $entry === null ? '' : (string) file_get_contents($this->path($entry));
+
         if ($entry === null) {
             $warnings[] = 'Point d\'entrée Inertia introuvable (resources/js/app.jsx).';
-        } elseif (! str_contains((string) file_get_contents($this->path($entry)), '.jsx')) {
+        } elseif (! $vitePlugin && ! str_contains($source, '.jsx')) {
             // Projet TypeScript (starter kit) : on garde les pages .tsx existantes et on ajoute les .jsx générées.
             $warnings[] = str_ends_with($entry, 'ts') || str_ends_with($entry, 'tsx')
                 ? "Le résolveur de pages de {$entry} doit accepter aussi les fichiers .jsx, par exemple :\n"
@@ -179,6 +184,13 @@ final class Installer
                 : "Le résolveur de pages de {$entry} doit accepter les fichiers .jsx, par exemple :\n"
                     ."    const pages = import.meta.glob('./{$directory}/**/*.jsx');\n"
                     ."    resolve: (name) => pages[`./{$directory}/\${name}.jsx`](),";
+        }
+
+        if (preg_match('/^\s*layout\s*:/m', $source) === 1) {
+            $warnings[] = "Le callback layout de {$entry} s'applique aussi aux pages générées, qui ont déjà leur AdminLayout :\n"
+                ."    retourner null pour elles, par exemple (convention Breeze, noms commençant par une majuscule) :\n"
+                ."    case /^[A-Z]/.test(name):\n"
+                .'        return null;';
         }
 
         $view = $this->path('resources/views/app.blade.php');

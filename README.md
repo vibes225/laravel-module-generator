@@ -119,7 +119,10 @@ Le starter kit React de Laravel est en TypeScript ; les modules générés sont 
 
 1. `config/module-generator.php` : `'pages_path' => 'resources/js/pages'` (nommage Breeze conservé dans le dossier du kit),
    ou `'convention' => 'starter-kit'` (nommage en minuscules) ;
-2. faire accepter les `.jsx` au résolveur de `resources/js/app.tsx` (l'installation affiche le code à utiliser) ;
+2. avec le plugin `@inertiajs/vite` (Inertia v3), les `.jsx` sont déjà résolus ; sinon, faire accepter les `.jsx` au
+   résolveur de `resources/js/app.tsx` (l'installation affiche le code à utiliser) ;
+   si `app.tsx` définit un callback `layout`, retourner `null` pour les pages générées (`case /^[A-Z]/.test(name):`),
+   qui ont déjà leur `AdminLayout` ;
 3. ajouter `@routes` (Ziggy) dans `resources/views/app.blade.php`.
 
 ## Interface web

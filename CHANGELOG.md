@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.1 (2026-09-30)
+
+- Installation : le plugin `@inertiajs/vite` (Inertia v3) est reconnu, il résout déjà les pages `.jsx`.
+- Installation : signale un callback `layout` global qui envelopperait les pages générées (double layout).
+
 ## 1.1.0 (2026-09-30)
 
 - Option `pages_path` : dossier racine des pages, indépendant de la convention (ex. nommage Breeze dans
