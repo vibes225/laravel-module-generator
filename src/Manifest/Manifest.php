@@ -15,6 +15,7 @@ final readonly class Manifest
      * @param  array<string, mixed>  $definition  définition normalisée (ModuleDefinition::toArray())
      * @param  array<string, string>  $versions
      * @param  list<ManifestFile>  $files
+     * @param  list<string>  $directories  dossiers créés par la génération (relatifs)
      */
     public function __construct(
         public string $slug,
@@ -23,6 +24,7 @@ final readonly class Manifest
         public string $generatedAt,
         public array $definition,
         public array $files,
+        public array $directories = [],
     ) {}
 
     /**
@@ -44,6 +46,7 @@ final readonly class Manifest
             (string) ($data['generated_at'] ?? ''),
             $data['definition'] ?? [],
             array_map(ManifestFile::fromArray(...), $data['files'] ?? []),
+            $data['directories'] ?? [],
         );
     }
 
@@ -64,18 +67,25 @@ final readonly class Manifest
             'generated_at' => $this->generatedAt,
             'definition' => $this->definition,
             'files' => array_map(fn (ManifestFile $file) => $file->toArray(), $this->files),
+            'directories' => $this->directories,
         ];
     }
 
     public function withStatus(ManifestStatus $status): self
     {
-        return new self($this->slug, $status, $this->versions, $this->generatedAt, $this->definition, $this->files);
+        return new self($this->slug, $status, $this->versions, $this->generatedAt, $this->definition, $this->files, $this->directories);
     }
 
     /** @param  list<ManifestFile>  $files */
     public function withFiles(array $files): self
     {
-        return new self($this->slug, $this->status, $this->versions, $this->generatedAt, $this->definition, $files);
+        return new self($this->slug, $this->status, $this->versions, $this->generatedAt, $this->definition, $files, $this->directories);
+    }
+
+    /** @param  list<string>  $directories */
+    public function withDirectories(array $directories): self
+    {
+        return new self($this->slug, $this->status, $this->versions, $this->generatedAt, $this->definition, $this->files, $directories);
     }
 
     public function isComplete(): bool

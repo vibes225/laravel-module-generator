@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 namespace Amon\ModuleGenerator;
 
+use Amon\ModuleGenerator\Console\InstallCommand;
+use Amon\ModuleGenerator\Console\ListCommand;
+use Amon\ModuleGenerator\Console\MakeCommand;
+use Amon\ModuleGenerator\Console\PublishStubsCommand;
+use Amon\ModuleGenerator\Console\RemoveCommand;
 use Amon\ModuleGenerator\Definition\DefinitionFactory;
 use Amon\ModuleGenerator\Definition\DefinitionNormalizer;
 use Amon\ModuleGenerator\Fields\FieldTypeRegistry;
@@ -16,6 +21,7 @@ use Amon\ModuleGenerator\Generation\PlanInspector;
 use Amon\ModuleGenerator\Manifest\ManifestRepository;
 use Amon\ModuleGenerator\Naming\Inflector;
 use Amon\ModuleGenerator\Registry\ModuleRegistry;
+use Amon\ModuleGenerator\Removal\Remover;
 use Amon\ModuleGenerator\Stubs\StubRenderer;
 use Amon\ModuleGenerator\Stubs\StubResolver;
 use Amon\ModuleGenerator\Support\LaravelVersion;
@@ -91,6 +97,7 @@ class ModuleGeneratorServiceProvider extends ServiceProvider
                 (string) $app['config']->get('module-generator.naming.models_namespace', 'App\Models'),
                 new DateTimeImmutable,
             ),
+            new Remover(base_path(), $app->make(ManifestRepository::class)),
         ));
     }
 
@@ -98,6 +105,13 @@ class ModuleGeneratorServiceProvider extends ServiceProvider
     {
         if ($this->app->runningInConsole()) {
             $this->registerPublishing();
+            $this->commands([
+                InstallCommand::class,
+                MakeCommand::class,
+                RemoveCommand::class,
+                ListCommand::class,
+                PublishStubsCommand::class,
+            ]);
         }
     }
 
@@ -110,7 +124,7 @@ class ModuleGeneratorServiceProvider extends ServiceProvider
         ], 'module-generator-config');
 
         $this->publishes([
-            $root.'/stubs' => base_path('stubs/module-generator'),
+            $root.'/stubs' => (string) config('module-generator.stubs_path', base_path('stubs/module-generator')),
         ], 'module-generator-stubs');
 
         $this->publishes([

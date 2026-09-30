@@ -18,6 +18,7 @@ use Amon\ModuleGenerator\Manifest\ManifestStatus;
 use Amon\ModuleGenerator\ModuleService;
 use Amon\ModuleGenerator\Naming\Inflector;
 use Amon\ModuleGenerator\Registry\ModuleRegistry;
+use Amon\ModuleGenerator\Removal\Remover;
 use Amon\ModuleGenerator\Stubs\StubRenderer;
 use Amon\ModuleGenerator\Stubs\StubResolver;
 use Amon\ModuleGenerator\Support\Hasher;
@@ -103,6 +104,7 @@ function moduleService(string $base, string $convention = 'breeze'): ModuleServi
         new PlanInspector($base, $registry),
         new PlanExecutor($base, $manifests, new NullFormatter, ['generator' => 'test']),
         fn () => new GenerationSettings($convention, 13, 'App\Models', new DateTimeImmutable('2026-09-30 10:00:00')),
+        new Remover($base, $manifests),
     );
 }
 

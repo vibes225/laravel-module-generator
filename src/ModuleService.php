@@ -16,6 +16,8 @@ use Amon\ModuleGenerator\Generation\PlanInspector;
 use Amon\ModuleGenerator\Manifest\Manifest;
 use Amon\ModuleGenerator\Manifest\ManifestRepository;
 use Amon\ModuleGenerator\Registry\ModuleRegistry;
+use Amon\ModuleGenerator\Removal\RemovalPlan;
+use Amon\ModuleGenerator\Removal\Remover;
 use Closure;
 
 /**
@@ -34,6 +36,7 @@ final class ModuleService
         private readonly PlanInspector $inspector,
         private readonly PlanExecutor $executor,
         private readonly Closure $settings,
+        private readonly Remover $remover,
     ) {}
 
     /**
@@ -79,6 +82,19 @@ final class ModuleService
     public function archivedInput(string $reference): ?array
     {
         return $this->manifests->findArchived($reference)?->definition;
+    }
+
+    public function removalPlan(string $slug): RemovalPlan
+    {
+        return $this->remover->plan($slug);
+    }
+
+    /**
+     * @return array{deleted: list<string>, kept: list<string>, missing: list<string>, directories: list<string>, archive: ?string}
+     */
+    public function remove(RemovalPlan $plan, bool $includeModified): array
+    {
+        return $this->remover->execute($plan, $includeModified, ($this->settings)()->now->format('Ymd-His'));
     }
 
     public function registry(): ModuleRegistry

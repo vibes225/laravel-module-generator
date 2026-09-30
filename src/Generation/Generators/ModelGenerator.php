@@ -205,7 +205,7 @@ final class ModelGenerator implements Generator
                 }
 
                 $target = $this->import($context->names->modelFqcn((string) $side->model));
-                $methods[] = $this->method(Facts::sideMethod($side), 'BelongsTo', "\$this->belongsTo({$target}::class, ".Escaper::php((string) $side->foreignKey).')');
+                $methods[] = $this->method(Facts::sideMethod($side), $this->import(self::RELATION_CLASSES['belongsTo']), "\$this->belongsTo({$target}::class, ".Escaper::php((string) $side->foreignKey).')');
             }
         }
 

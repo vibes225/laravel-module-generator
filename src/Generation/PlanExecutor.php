@@ -91,7 +91,8 @@ final class PlanExecutor
             Hasher::hash((string) file_get_contents($this->path($file->path))),
         ), $plan->files);
 
-        $manifest = $manifest->withFiles($entries)->withStatus(ManifestStatus::Complete);
+        $directories = array_map(fn (string $directory) => substr(str_replace(chr(92), '/', $directory), strlen($this->basePath) + 1), array_values(array_unique($createdDirectories)));
+        $manifest = $manifest->withFiles($entries)->withDirectories($directories)->withStatus(ManifestStatus::Complete);
         $this->manifests->save($manifest);
 
         return $manifest;

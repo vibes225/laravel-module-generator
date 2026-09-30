@@ -13,4 +13,17 @@ abstract class TestCase extends Orchestra
     {
         return [ModuleGeneratorServiceProvider::class];
     }
+
+    /** Redirige le projet hôte vers un bac à sable « installé » (aucune écriture dans le squelette Testbench). */
+    protected function useSandboxProject(): string
+    {
+        $base = installedSandbox();
+        $this->app->setBasePath($base);
+        config([
+            'module-generator.manifest_path' => $base.'/.module-generator',
+            'module-generator.format.pint' => false,
+        ]);
+
+        return $base;
+    }
 }
