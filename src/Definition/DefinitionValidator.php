@@ -188,8 +188,14 @@ final class DefinitionValidator
     /** @param  array<string, mixed>  $d */
     private function identity(array $d): void
     {
-        $this->text($d['name'] ?? null, 'name');
         $this->text($d['singular'] ?? null, 'singular');
+
+        // Sans libellé singulier, les noms dérivés manquent : une seule erreur, à la source.
+        if (($d['singular'] ?? null) === null && ($d['name'] ?? null) === null && ($d['model'] ?? null) === null) {
+            return;
+        }
+
+        $this->text($d['name'] ?? null, 'name');
         $this->model($d['model'] ?? null, 'model');
         $this->snake($d['table'] ?? null, 'table');
         $this->matches($d['slug'] ?? null, '/^[a-z][a-z0-9]*(-[a-z0-9]+)*$/', 'slug', 'Slug invalide : minuscules, chiffres et tirets (ex. client-contacts).');

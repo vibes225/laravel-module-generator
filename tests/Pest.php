@@ -23,6 +23,7 @@ use Amon\ModuleGenerator\Stubs\StubRenderer;
 use Amon\ModuleGenerator\Stubs\StubResolver;
 use Amon\ModuleGenerator\Support\Hasher;
 use Amon\ModuleGenerator\Tests\TestCase;
+use Amon\ModuleGenerator\Tests\UiTestCase;
 
 uses(TestCase::class)->in('Feature');
 
@@ -127,3 +128,5 @@ function planFor(array $input, string $convention = 'breeze'): GenerationPlan
 
     return $generator->plan(definitionFactory()->make($input), new GenerationSettings($convention, 13, 'App\Models', new DateTimeImmutable('2026-09-30 10:00:00')));
 }
+
+uses(UiTestCase::class)->in('Http');

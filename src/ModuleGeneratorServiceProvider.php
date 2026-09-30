@@ -18,6 +18,7 @@ use Amon\ModuleGenerator\Generation\GenerationSettings;
 use Amon\ModuleGenerator\Generation\ModuleGenerator;
 use Amon\ModuleGenerator\Generation\PlanExecutor;
 use Amon\ModuleGenerator\Generation\PlanInspector;
+use Amon\ModuleGenerator\Http\Middleware\HandleToolRequests;
 use Amon\ModuleGenerator\Manifest\ManifestRepository;
 use Amon\ModuleGenerator\Naming\Inflector;
 use Amon\ModuleGenerator\Registry\ModuleRegistry;
@@ -26,8 +27,9 @@ use Amon\ModuleGenerator\Stubs\StubRenderer;
 use Amon\ModuleGenerator\Stubs\StubResolver;
 use Amon\ModuleGenerator\Support\LaravelVersion;
 use Amon\ModuleGenerator\Support\PackageVersion;
-use DateTimeImmutable;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
 class ModuleGeneratorServiceProvider extends ServiceProvider
@@ -95,7 +97,7 @@ class ModuleGeneratorServiceProvider extends ServiceProvider
                 (string) $app['config']->get('module-generator.convention', 'breeze'),
                 LaravelVersion::major($app->version()),
                 (string) $app['config']->get('module-generator.naming.models_namespace', 'App\Models'),
-                new DateTimeImmutable,
+                Date::now()->toDateTimeImmutable(),
             ),
             new Remover(base_path(), $app->make(ManifestRepository::class)),
         ));
@@ -103,6 +105,15 @@ class ModuleGeneratorServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        $this->loadViewsFrom(dirname(__DIR__).'/resources/views', 'module-generator');
+
+        if (config('module-generator.ui.enabled')) {
+            Route::middleware([...(array) config('module-generator.ui.middleware', ['web']), HandleToolRequests::class])
+                ->prefix((string) config('module-generator.ui.prefix', 'module-generator'))
+                ->name('module-generator.')
+                ->group(dirname(__DIR__).'/routes/tool.php');
+        }
+
         if ($this->app->runningInConsole()) {
             $this->registerPublishing();
             $this->commands([

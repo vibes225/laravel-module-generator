@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace Amon\ModuleGenerator\Tests;
 
 use Amon\ModuleGenerator\ModuleGeneratorServiceProvider;
+use Inertia\ServiceProvider as InertiaServiceProvider;
 use Orchestra\Testbench\TestCase as Orchestra;
 
 abstract class TestCase extends Orchestra
 {
     protected function getPackageProviders($app): array
     {
-        return [ModuleGeneratorServiceProvider::class];
+        return [InertiaServiceProvider::class, ModuleGeneratorServiceProvider::class];
     }
 
     /** Redirige le projet hôte vers un bac à sable « installé » (aucune écriture dans le squelette Testbench). */
