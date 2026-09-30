@@ -1,0 +1,7 @@
+<MultiSelect
+    label={%%LABEL%%}
+    options={options.%%OPTIONS%% ?? []}
+    value={data.%%NAME%% ?? []}
+    onChange={(value) => setData('%%NAME%%', value)}
+    error={errors.%%NAME%%}
+/>

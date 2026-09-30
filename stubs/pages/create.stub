@@ -1,0 +1,15 @@
+import { AdminLayout } from '%%KIT_PATH%%';
+import %%FORM%% from './partials/%%FORM%%';
+
+const TITLE = %%TITLE%%;
+
+export default function Create({ options }) {
+    return (
+        <AdminLayout
+            title="Nouveau"
+            breadcrumbs={[{ label: TITLE, href: route('%%ROUTE%%.index') }, { label: 'Nouveau' }]}
+        >
+            <%%FORM%% options={options} />
+        </AdminLayout>
+    );
+}

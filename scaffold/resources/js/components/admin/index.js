@@ -18,5 +18,5 @@ export { default as Select } from './Select';
 export { default as Sidebar } from './Sidebar';
 export { default as Switch } from './Switch';
 export { default as Textarea } from './Textarea';
-export { formatBoolean, formatDate, formatDateTime, formatMoney, formatNumber } from './format';
+export { formatBoolean, formatDate, formatDateTime, formatMoney, formatNumber, optionLabel } from './format';
 export { visitWithQuery } from './query';

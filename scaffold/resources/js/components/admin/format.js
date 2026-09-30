@@ -72,3 +72,14 @@ export function formatDateTime(value) {
 export function formatBoolean(value) {
     return value ? 'Oui' : 'Non';
 }
+
+// Libellé d'une valeur dans une liste d'options [{ value, label }] (enums, relations, types).
+export function optionLabel(options, value) {
+    if (isEmpty(value)) {
+        return EMPTY;
+    }
+
+    const option = (options ?? []).find((item) => String(item.value) === String(value));
+
+    return option ? option.label : String(value);
+}

@@ -1,0 +1,15 @@
+import { AdminLayout } from '%%KIT_PATH%%';
+import %%FORM%% from './partials/%%FORM%%';
+
+const TITLE = %%TITLE%%;
+
+export default function Edit({ record, options }) {
+    return (
+        <AdminLayout
+            title="Modifier"
+            breadcrumbs={[{ label: TITLE, href: route('%%ROUTE%%.index') }, { label: 'Modifier' }]}
+        >
+            <%%FORM%% record={record} options={options} />
+        </AdminLayout>
+    );
+}

@@ -12,6 +12,7 @@ use Amon\ModuleGenerator\Generation\Generators\FilterGenerator;
 use Amon\ModuleGenerator\Generation\Generators\MenuGenerator;
 use Amon\ModuleGenerator\Generation\Generators\MigrationGenerator;
 use Amon\ModuleGenerator\Generation\Generators\ModelGenerator;
+use Amon\ModuleGenerator\Generation\Generators\PageGenerator;
 use Amon\ModuleGenerator\Generation\Generators\RequestGenerator;
 use Amon\ModuleGenerator\Generation\Generators\RouteGenerator;
 
@@ -30,6 +31,7 @@ final class DefaultGenerators
             new FactoryGenerator,
             new RouteGenerator,
             new MenuGenerator,
+            new PageGenerator,
         ];
     }
 }

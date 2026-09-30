@@ -6,6 +6,7 @@ import { visitWithQuery } from './query';
  * columns : [{ key, label, sortable?, align?, className?, render?(row) }]
  * sort    : { by, direction } tel que renvoyé par le serveur
  * actions : (row) => noeud affiché dans la dernière colonne
+ * rowKey  : nom de colonne ou fonction (row) => clé unique
  */
 export default function DataTable({ columns, rows, rowKey = 'id', sort = {}, actions, emptyState }) {
     const toggleSort = (key) => {
@@ -57,7 +58,7 @@ export default function DataTable({ columns, rows, rowKey = 'id', sort = {}, act
                     </thead>
                     <tbody className="divide-y divide-slate-100">
                         {rows.map((row) => (
-                            <tr key={row[rowKey]} className="hover:bg-slate-50">
+                            <tr key={typeof rowKey === 'function' ? rowKey(row) : row[rowKey]} className="hover:bg-slate-50">
                                 {columns.map((column) => (
                                     <td
                                         key={column.key}

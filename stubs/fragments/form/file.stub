@@ -1,0 +1,7 @@
+<Input
+    label={%%LABEL%%}
+    type="file"%%REQUIRED%%%%PROPS%%
+    onChange={(event) => setData('%%NAME%%', event.target.files[0] ?? null)}
+    hint={record?.%%NAME%%_url ? 'Laisser vide pour conserver le fichier actuel.' : undefined}
+    error={errors.%%NAME%%}
+/>

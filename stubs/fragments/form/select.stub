@@ -1,0 +1,1 @@
+<Select label={%%LABEL%%}%%REQUIRED%% options={options.%%OPTIONS%% ?? []} {...bind('%%NAME%%')} />

@@ -301,7 +301,8 @@ abstract class AbstractFieldType implements FieldType
         $props = '';
 
         foreach ($this->inputProps($field) as $prop => $value) {
-            $props .= ' '.$prop.'="'.$value.'"';
+            // Une valeur entre accolades est une expression JSX, sinon une chaîne littérale.
+            $props .= str_starts_with($value, '{') ? " {$prop}={$value}" : ' '.$prop.'="'.$value.'"';
         }
 
         return ['PROPS' => $props];

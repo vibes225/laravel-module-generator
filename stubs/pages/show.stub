@@ -1,0 +1,25 @@
+import { Pencil } from 'lucide-react';
+import { %%KIT%% } from '%%KIT_PATH%%';
+
+const TITLE = %%TITLE%%;
+
+export default function Show({ %%PROPS%% }) {
+    return (
+        <AdminLayout
+            title={%%RECORD_TITLE%%}
+            breadcrumbs={[{ label: TITLE, href: route('%%ROUTE%%.index') }, { label: 'Fiche' }]}
+            actions={
+                <Button href={route('%%ROUTE%%.edit', record.id)}>
+                    <Pencil className="h-4 w-4" />
+                    Modifier
+                </Button>
+            }
+        >
+            <div className="max-w-3xl overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+                <dl className="divide-y divide-slate-100">
+%%ITEMS%%
+                </dl>
+            </div>
+        </AdminLayout>
+    );
+}

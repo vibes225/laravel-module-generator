@@ -1,0 +1,1 @@
+<Switch label={%%LABEL%%} checked={Boolean(data.%%NAME%%)} onChange={(value) => setData('%%NAME%%', value)} error={errors.%%NAME%%} />

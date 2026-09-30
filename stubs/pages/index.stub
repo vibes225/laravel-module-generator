@@ -1,0 +1,72 @@
+import { useState } from 'react';
+import { router } from '@inertiajs/react';
+import { %%ICONS%% } from 'lucide-react';
+import {
+%%KIT%%
+} from '%%KIT_PATH%%';
+
+const TITLE = %%TITLE%%;
+
+export default function Index({ %%PROPS%% }) {
+    const [toDelete, setToDelete] = useState(null);
+    const [processing, setProcessing] = useState(false);
+%%HELPERS%%
+    const columns = [
+%%COLUMNS%%
+    ];
+
+    const confirmDelete = () => {
+        router.delete(route('%%ROUTE%%.destroy', %%DESTROY_PARAMETERS%%), {
+            preserveScroll: true,
+            onStart: () => setProcessing(true),
+            onFinish: () => {
+                setProcessing(false);
+                setToDelete(null);
+            },
+        });
+    };
+
+    return (
+        <AdminLayout
+            title={TITLE}
+            breadcrumbs={[{ label: TITLE }]}
+            actions={
+                <Button href={route('%%ROUTE%%.create')}>
+                    <Plus className="h-4 w-4" />
+                    Nouveau
+                </Button>
+            }
+        >
+            <Filters
+                values={filters}
+                search={%%SEARCH%%}
+                filters={[
+%%FILTERS%%
+                ]}
+            />
+            <DataTable
+                columns={columns}
+                rows={records.data}
+                rowKey={%%ROW_KEY%%}
+                sort={{ by: filters.sort, direction: filters.direction }}
+                actions={(row) => (
+                    <div className="flex justify-end gap-1">
+%%ROW_ACTIONS%%                        <Button size="sm" variant="ghost" onClick={() => setToDelete(row)} aria-label="Supprimer">
+                            <Trash2 className="h-4 w-4 text-red-600" />
+                        </Button>
+                    </div>
+                )}
+            />
+            <Pagination paginator={records} />
+            <ConfirmDialog
+                open={toDelete !== null}
+                title="Supprimer"
+                message="Voulez-vous vraiment supprimer cet enregistrement ? Cette action est irréversible."
+                confirmLabel="Supprimer"
+                processing={processing}
+                onCancel={() => setToDelete(null)}
+                onConfirm={confirmDelete}
+            />
+        </AdminLayout>
+    );
+}

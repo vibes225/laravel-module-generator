@@ -1,0 +1,1 @@
+<Textarea label={%%LABEL%%}%%REQUIRED%% rows={6} className="font-mono" {...bind('%%NAME%%')} />

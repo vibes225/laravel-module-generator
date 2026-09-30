@@ -1,0 +1,13 @@
+<Select
+    label="Type"%%REQUIRED%%
+    options={options.%%NAME%%_type ?? []}
+    value={data.%%NAME%%_type ?? ''}
+    onChange={(event) => setData((values) => ({ ...values, %%NAME%%_type: event.target.value, %%NAME%%_id: '' }))}
+    error={errors.%%NAME%%_type}
+/>
+<Select
+    label="Élément"%%REQUIRED%%
+    options={options.%%NAME%%_id?.[data.%%NAME%%_type] ?? []}
+    disabled={!data.%%NAME%%_type}
+    {...bind('%%NAME%%_id')}
+/>
