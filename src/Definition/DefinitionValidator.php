@@ -99,7 +99,7 @@ final class DefinitionValidator
         $this->morph($d['morph'] ?? null);
         $this->fields($d['fields'] ?? null, $kind);
         $this->relations($d['relations'] ?? null, $d['table'] ?? null);
-        $this->options($d['options'] ?? null, $d['fields'] ?? []);
+        $this->options($d['options'] ?? null, $d['fields'] ?? [], ($d['tree'] ?? false) === true);
 
         return $this->errors;
     }
@@ -261,6 +261,8 @@ final class DefinitionValidator
             }
 
             $this->model($side['model'] ?? null, "{$path}.model");
+            $this->snake($side['table'] ?? null, "{$path}.table");
+            $this->snake($side['display'] ?? null, "{$path}.display");
 
             if ($this->snake($side['foreign_key'] ?? null, "{$path}.foreign_key")) {
                 $this->claimColumn($side['foreign_key'], "{$path}.foreign_key", "le côté {$key} du pivot");
@@ -273,6 +275,10 @@ final class DefinitionValidator
 
         if ($polymorphic === 2) {
             $this->add('pivot', 'Un seul côté du pivot peut être polymorphe.');
+        }
+
+        if ($polymorphic === 1 && ($pivot['primary_id'] ?? true) === false) {
+            $this->add('pivot.primary_id', 'Un module pivot polymorphe exige la clé primaire id.');
         }
 
         if ($polymorphic === 1 && ! is_array($d['morph'] ?? null)) {
@@ -540,6 +546,14 @@ final class DefinitionValidator
 
         if ($mode === PivotMode::Module) {
             $this->matches($pivot['module'] ?? null, '/^[a-z][a-z0-9]*(-[a-z0-9]+)*$/', "{$path}.pivot.module", 'Slug du module pivot attendu.');
+
+            // Modèle et table du module pivot : complétés depuis le registre (ModuleService) ou fournis.
+            if (! is_string($pivot['model'] ?? null) || ! is_string($pivot['table'] ?? null)) {
+                $this->add("{$path}.pivot.module", 'Module pivot non résolu : modèle et table inconnus (module absent du registre ?).');
+            } else {
+                $this->model($pivot['model'], "{$path}.pivot.model");
+                $this->snake($pivot['table'], "{$path}.pivot.table");
+            }
         }
 
         $taken = array_flip(array_filter([$foreign, $related, 'id', 'created_at', 'updated_at'], 'is_string'));
@@ -558,7 +572,7 @@ final class DefinitionValidator
     }
 
     /** @param  mixed  $fields  champs du module (déjà validés) */
-    private function options(mixed $options, mixed $fields): void
+    private function options(mixed $options, mixed $fields, bool $tree): void
     {
         if (! is_array($options)) {
             $this->add('options', 'Options du module attendues.');
@@ -587,7 +601,7 @@ final class DefinitionValidator
             $this->add('options.default_sort.direction', 'Valeur attendue : asc ou desc.');
         }
 
-        $sortable = ['id'];
+        $sortable = $tree ? ['id', '_lft'] : ['id'];
 
         if (($options['timestamps'] ?? false) === true) {
             array_push($sortable, 'created_at', 'updated_at');

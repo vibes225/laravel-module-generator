@@ -16,9 +16,11 @@ final class TextType extends AbstractFieldType
 
     protected array $presentation = ['in_table' => false];
 
-    protected array $schema = [];
+    protected string $column = 'text';
 
-    protected ?string $defaultKind = null;
+    protected array $typeRules = ["'string'"];
 
-    protected bool $pivotAllowed = true;
+    protected string $fragment = 'textarea';
+
+    protected string $factory = 'fake()->paragraph()';
 }

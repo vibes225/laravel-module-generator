@@ -1,0 +1,11 @@
+<?php
+
+use App\Http\Controllers\Admin\%%CONTROLLER%%;
+use Illuminate\Support\Facades\Route;
+
+Route::controller(%%CONTROLLER%%::class)->prefix('%%SLUG%%')->name('%%SLUG%%.')->group(function () {
+    Route::get('/', 'index')->name('index');
+    Route::get('create', 'create')->name('create');
+    Route::post('/', 'store')->name('store');
+    Route::delete('{%%LEFT_PARAMETER%%}/{%%RIGHT_PARAMETER%%}', 'destroy')->name('destroy');
+});

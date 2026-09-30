@@ -1,0 +1,23 @@
+<?php
+
+namespace Database\Factories;
+
+%%IMPORTS%%
+
+/**
+ * @extends Factory<%%MODEL%%>
+ */
+class %%CLASS%% extends Factory
+{
+    protected $model = %%MODEL%%::class;
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function definition(): array
+    {
+        return [
+%%VALUES%%
+        ];
+    }
+}

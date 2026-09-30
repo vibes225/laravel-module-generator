@@ -16,9 +16,19 @@ final class DateTimeType extends AbstractFieldType
 
     protected array $presentation = ['sortable' => true];
 
-    protected array $schema = [];
-
     protected ?string $defaultKind = 'datetime';
 
-    protected bool $pivotAllowed = true;
+    protected string $column = 'dateTime';
+
+    protected ?string $castAs = 'datetime:Y-m-d H:i:s';
+
+    protected array $typeRules = ["'date'"];
+
+    protected string $fragment = 'date';
+
+    protected array $inputProps = ['type' => 'datetime-local'];
+
+    protected string $factory = "fake()->dateTime()->format('Y-m-d H:i:s')";
+
+    protected ?string $displayHelper = 'formatDateTime';
 }

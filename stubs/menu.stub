@@ -1,0 +1,10 @@
+<?php
+
+return [
+    'label' => %%LABEL%%,
+    'route' => '%%ROUTE%%.index',
+    'icon' => '%%ICON%%',
+    'group' => '%%GROUP%%',
+    'order' => %%ORDER%%,
+    'permission' => %%PERMISSION%%,
+];

@@ -1,0 +1,75 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+%%IMPORTS%%
+
+class %%CLASS%% extends Controller
+{
+    public function index(Request $request): Response
+    {
+        $filter = new %%FILTER%%($request);
+
+        return Inertia::render('%%PAGE_INDEX%%', [
+            'records' => $filter->paginate(%%MODEL%%::query()%%INDEX_QUERY%%),
+            'filters' => $filter->state(),
+            'options' => $this->options(),
+        ]);
+    }
+
+    public function create(): Response
+    {
+        return Inertia::render('%%PAGE_CREATE%%', [
+            'options' => $this->options(),
+        ]);
+    }
+
+    public function store(%%STORE_REQUEST%% $request): RedirectResponse
+    {
+        $data = $request->validated();
+%%STORE_PREPARE%%        $%%VARIABLE%% = %%MODEL%%::create(%%SAVE_DATA%%);
+%%STORE_AFTER%%
+        return to_route('%%ROUTE%%.index')->with('success', 'Enregistrement créé.');
+    }
+
+    public function show(%%MODEL%% $%%VARIABLE%%): Response
+    {
+        return Inertia::render('%%PAGE_SHOW%%', [
+            'record' => %%SHOW_RECORD%%,
+            'options' => $this->options(),
+        ]);
+    }
+
+    public function edit(%%MODEL%% $%%VARIABLE%%): Response
+    {
+        return Inertia::render('%%PAGE_EDIT%%', [
+            'record' => %%EDIT_RECORD%%,
+            'options' => $this->options(),
+        ]);
+    }
+
+    public function update(%%UPDATE_REQUEST%% $request, %%MODEL%% $%%VARIABLE%%): RedirectResponse
+    {
+        $data = $request->validated();
+%%UPDATE_PREPARE%%        $%%VARIABLE%%->update(%%SAVE_DATA%%);
+%%UPDATE_AFTER%%
+        return to_route('%%ROUTE%%.index')->with('success', 'Enregistrement mis à jour.');
+    }
+
+    public function destroy(%%MODEL%% $%%VARIABLE%%): RedirectResponse
+    {
+        $%%VARIABLE%%->delete();
+%%DESTROY_AFTER%%
+        return to_route('%%ROUTE%%.index')->with('success', 'Enregistrement supprimé.');
+    }
+
+    /**
+     * Options des listes : formulaires, filtres et libellés.
+     *
+     * @return array<string, mixed>
+     */
+    private function options(): array
+    {
+        return %%OPTIONS%%;
+    }
+}

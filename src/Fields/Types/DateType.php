@@ -16,9 +16,19 @@ final class DateType extends AbstractFieldType
 
     protected array $presentation = ['sortable' => true];
 
-    protected array $schema = [];
-
     protected ?string $defaultKind = 'date';
 
-    protected bool $pivotAllowed = true;
+    protected string $column = 'date';
+
+    protected ?string $castAs = 'date:Y-m-d';
+
+    protected array $typeRules = ["'date'"];
+
+    protected string $fragment = 'date';
+
+    protected array $inputProps = ['type' => 'date'];
+
+    protected string $factory = 'fake()->date()';
+
+    protected ?string $displayHelper = 'formatDate';
 }

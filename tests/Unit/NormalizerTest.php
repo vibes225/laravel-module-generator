@@ -84,7 +84,7 @@ it('dérive les relations', function () {
         ->and($relations[1])->toMatchArray(['name' => 'invoiceLines', 'foreign_key' => 'invoice_id', 'in_form' => false])
         ->and($relations[2])->toMatchArray([
             'name' => 'tags', 'foreign_pivot_key' => 'invoice_id', 'related_pivot_key' => 'tag_id',
-            'pivot' => ['mode' => 'generate', 'table' => 'invoice_tag', 'timestamps' => false, 'fields' => [], 'module' => null],
+            'pivot' => ['mode' => 'generate', 'table' => 'invoice_tag', 'timestamps' => false, 'fields' => [], 'module' => null, 'model' => null],
         ])
         ->and($relations[3])->toMatchArray(['foreign_key' => 'owner_id', 'on_delete' => 'null']);
 });
@@ -107,8 +107,8 @@ it('normalise un module pivot et nomme sa table par ordre alphabétique', functi
 
     expect($d['table'])->toBe('client_tag')
         ->and($d['pivot'])->toBe([
-            'left' => ['model' => 'Tag', 'foreign_key' => 'tag_id', 'on_delete' => 'cascade', 'polymorphic' => false],
-            'right' => ['model' => 'Client', 'foreign_key' => 'client_id', 'on_delete' => 'cascade', 'polymorphic' => false],
+            'left' => ['model' => 'Tag', 'table' => 'tags', 'foreign_key' => 'tag_id', 'on_delete' => 'cascade', 'polymorphic' => false, 'display' => 'name'],
+            'right' => ['model' => 'Client', 'table' => 'clients', 'foreign_key' => 'client_id', 'on_delete' => 'cascade', 'polymorphic' => false, 'display' => 'name'],
             'unique_pair' => true,
             'primary_id' => true,
         ]);

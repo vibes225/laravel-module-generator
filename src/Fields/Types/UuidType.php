@@ -14,11 +14,9 @@ final class UuidType extends AbstractFieldType
 
     protected array $allows = ['unique', 'index', 'searchable', 'sortable', 'filterable'];
 
-    protected array $presentation = [];
+    protected string $column = 'uuid';
 
-    protected array $schema = [];
+    protected array $typeRules = ["'uuid'"];
 
-    protected ?string $defaultKind = null;
-
-    protected bool $pivotAllowed = true;
+    protected string $factory = 'fake()->uuid()';
 }

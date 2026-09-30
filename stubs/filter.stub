@@ -1,0 +1,18 @@
+<?php
+
+namespace App\Filters;
+
+class %%CLASS%% extends QueryFilter
+{
+    protected array $searchable = %%SEARCHABLE%%;
+
+    protected array $sortable = %%SORTABLE%%;
+
+    protected array $filters = %%FILTERS%%;
+
+    protected string $defaultSort = %%DEFAULT_SORT%%;
+
+    protected string $defaultDirection = %%DEFAULT_DIRECTION%%;
+
+    protected int $perPage = %%PER_PAGE%%;
+}

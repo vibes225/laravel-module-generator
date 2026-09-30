@@ -74,9 +74,9 @@ it('signale les collisions avec les modules enregistrés', function () {
         'slug' => 'clients',
         'relations' => [
             ['type' => 'belongsToMany', 'target' => 'Label', 'pivot' => ['mode' => 'generate', 'table' => 'clients']],
-            ['type' => 'belongsToMany', 'target' => 'Tag', 'name' => 'viaModule', 'pivot' => ['mode' => 'module', 'module' => 'invoice-tag']],
-            ['type' => 'belongsToMany', 'target' => 'Tag', 'name' => 'missing', 'pivot' => ['mode' => 'module', 'module' => 'nope']],
-            ['type' => 'belongsToMany', 'target' => 'Tag', 'name' => 'notPivot', 'pivot' => ['mode' => 'module', 'module' => 'clients']],
+            ['type' => 'belongsToMany', 'target' => 'Tag', 'name' => 'viaModule', 'pivot' => ['mode' => 'module', 'module' => 'invoice-tag', 'model' => 'InvoiceTag', 'table' => 'invoice_tag']],
+            ['type' => 'belongsToMany', 'target' => 'Tag', 'name' => 'missing', 'pivot' => ['mode' => 'module', 'module' => 'nope', 'model' => 'Nope', 'table' => 'nope']],
+            ['type' => 'belongsToMany', 'target' => 'Tag', 'name' => 'notPivot', 'pivot' => ['mode' => 'module', 'module' => 'clients', 'model' => 'Client', 'table' => 'clients']],
         ],
     ])));
 

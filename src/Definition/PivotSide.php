@@ -9,15 +9,17 @@ final readonly class PivotSide
 {
     public function __construct(
         public ?string $model,
+        public ?string $table,
         public ?string $foreignKey,
         public string $onDelete,
         public bool $polymorphic,
+        public string $display = 'name',
     ) {}
 
     /** @param  array<string, mixed>  $data */
     public static function fromArray(array $data): self
     {
-        return new self($data['model'], $data['foreign_key'], $data['on_delete'], $data['polymorphic']);
+        return new self($data['model'], $data['table'], $data['foreign_key'], $data['on_delete'], $data['polymorphic'], $data['display'] ?? 'name');
     }
 
     /** @return array<string, mixed> */
@@ -25,9 +27,11 @@ final readonly class PivotSide
     {
         return [
             'model' => $this->model,
+            'table' => $this->table,
             'foreign_key' => $this->foreignKey,
             'on_delete' => $this->onDelete,
             'polymorphic' => $this->polymorphic,
+            'display' => $this->display,
         ];
     }
 }

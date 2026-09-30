@@ -4,21 +4,35 @@ declare(strict_types=1);
 
 namespace Amon\ModuleGenerator\Fields\Types;
 
-use Amon\ModuleGenerator\Fields\AbstractFieldType;
+use Amon\ModuleGenerator\Definition\FieldDefinition;
+use Amon\ModuleGenerator\Fields\FileLike;
 
-final class ImageType extends AbstractFieldType
+final class ImageType extends FileLike
 {
     protected string $name = 'image';
 
     protected string $label = 'Image';
 
-    protected array $allows = [];
+    protected array $schema = [
+        'disk' => ['type' => 'identifier', 'label' => 'Disque', 'default' => 'public'],
+        'max_size' => ['type' => 'int', 'label' => 'Taille maximale (Ko)', 'default' => 2048, 'min' => 1, 'max' => 1048576],
+        'extensions' => ['type' => 'list', 'label' => 'Extensions acceptées', 'default' => ['jpg', 'jpeg', 'png', 'webp']],
+    ];
 
-    protected array $presentation = [];
+    protected function ruleBase(): string
+    {
+        return 'File::image()';
+    }
 
-    protected array $schema = ['disk' => ['type' => 'identifier', 'label' => 'Disque', 'default' => 'public'], 'max_size' => ['type' => 'int', 'label' => 'Taille maximale (Ko)', 'default' => 2048, 'min' => 1, 'max' => 1048576], 'extensions' => ['type' => 'list', 'label' => 'Extensions acceptées', 'default' => ['jpg', 'jpeg', 'png', 'webp']]];
+    protected function placeholderExtension(): string
+    {
+        return 'png';
+    }
 
-    protected ?string $defaultKind = null;
+    public function display(FieldDefinition $field, string $variable): string
+    {
+        $url = "{$variable}.{$field->name}_url";
 
-    protected bool $pivotAllowed = false;
+        return "{$url} ? <img src={{$url}} alt=\"\" className=\"h-10 w-10 rounded object-cover\" /> : '—'";
+    }
 }

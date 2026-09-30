@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Amon\ModuleGenerator\Fields;
 
 use Amon\ModuleGenerator\Contracts\FieldType;
+use Amon\ModuleGenerator\Definition\FieldDefinition;
+use Amon\ModuleGenerator\Generation\ModuleNames;
+use Amon\ModuleGenerator\Support\Escaper;
 use DateTimeImmutable;
 
 /**
@@ -186,5 +189,161 @@ abstract class AbstractFieldType implements FieldType
     protected function validateEnumDefault(mixed $value, array $options): ?string
     {
         return null;
+    }
+
+    // --- Génération ---
+
+    /** Méthode Blueprint de la colonne. */
+    protected string $column = 'string';
+
+    /** Cast Eloquent (sans guillemets), ou null. */
+    protected ?string $castAs = null;
+
+    /** @var list<string> règles propres au type, en expressions PHP */
+    protected array $typeRules = [];
+
+    protected string $fragment = 'input';
+
+    /** @var array<string, string> props JSX supplémentaires du champ (valeurs littérales) */
+    protected array $inputProps = [];
+
+    protected string $factory = 'fake()->word()';
+
+    /** Fonction du kit appliquée à l'affichage (`formatDate`), ou null pour la valeur brute. */
+    protected ?string $displayHelper = null;
+
+    public function migrationColumn(FieldDefinition $field): string
+    {
+        $column = '$table->'.$this->columnMethod($field).'('.implode(', ', $this->columnArguments($field)).')';
+
+        if ($field->nullable) {
+            $column .= '->nullable()';
+        }
+
+        if ($field->default !== null) {
+            $column .= '->default('.Escaper::phpValue($field->default).')';
+        }
+
+        if ($field->unique) {
+            $column .= '->unique()';
+        } elseif ($field->index) {
+            $column .= '->index()';
+        }
+
+        return $column.$this->columnSuffix($field);
+    }
+
+    protected function columnMethod(FieldDefinition $field): string
+    {
+        return $this->column;
+    }
+
+    /** @return list<string> */
+    protected function columnArguments(FieldDefinition $field): array
+    {
+        return [Escaper::php($field->name)];
+    }
+
+    protected function columnSuffix(FieldDefinition $field): string
+    {
+        return '';
+    }
+
+    public function cast(FieldDefinition $field, ModuleNames $names): ?string
+    {
+        return $this->castAs === null ? null : Escaper::php($this->castAs);
+    }
+
+    public function rules(FieldDefinition $field, ModuleNames $names, bool $update): array
+    {
+        $optionalOnUpdate = $update && ($this->isFile() || $this->name === 'password');
+        $rules = [Escaper::php($field->nullable || $optionalOnUpdate ? 'nullable' : 'required')];
+        array_push($rules, ...$this->typeRules($field, $names));
+
+        if ($field->unique) {
+            $rule = 'Rule::unique('.Escaper::php($names->table).', '.Escaper::php($field->name).')';
+            $rules[] = $update ? $rule.'->ignore($this->route('.Escaper::php($names->routeParameter).'))' : $rule;
+        }
+
+        return $rules;
+    }
+
+    /** @return list<string> */
+    protected function typeRules(FieldDefinition $field, ModuleNames $names): array
+    {
+        return $this->typeRules;
+    }
+
+    public function imports(FieldDefinition $field, ModuleNames $names): array
+    {
+        return $field->unique ? ['Illuminate\Validation\Rule'] : [];
+    }
+
+    public function factoryValue(FieldDefinition $field, ModuleNames $names): string
+    {
+        $value = $this->factoryExpression($field, $names);
+
+        return $field->unique && str_starts_with($value, 'fake()->') ? 'fake()->unique()->'.substr($value, 8) : $value;
+    }
+
+    protected function factoryExpression(FieldDefinition $field, ModuleNames $names): string
+    {
+        return $this->factory;
+    }
+
+    public function formFragment(FieldDefinition $field): string
+    {
+        return $this->fragment;
+    }
+
+    public function formVariables(FieldDefinition $field): array
+    {
+        $props = '';
+
+        foreach ($this->inputProps($field) as $prop => $value) {
+            $props .= ' '.$prop.'="'.$value.'"';
+        }
+
+        return ['PROPS' => $props];
+    }
+
+    /** @return array<string, string> */
+    protected function inputProps(FieldDefinition $field): array
+    {
+        return $this->inputProps;
+    }
+
+    public function formInitial(FieldDefinition $field): string
+    {
+        $default = match (true) {
+            is_string($field->default) => Escaper::js($field->default),
+            is_bool($field->default) => $field->default ? 'true' : 'false',
+            is_int($field->default), is_float($field->default) => (string) $field->default,
+            default => "''",
+        };
+
+        return "record?.{$field->name} ?? {$default}";
+    }
+
+    public function display(FieldDefinition $field, string $variable): string
+    {
+        $value = "{$variable}.{$field->name}";
+
+        return $this->displayHelper === null ? "{$value} ?? '—'" : "{$this->displayHelper}({$value})";
+    }
+
+    public function displayImports(FieldDefinition $field): array
+    {
+        return $this->displayHelper === null ? [] : [$this->displayHelper];
+    }
+
+    public function optionsExpression(FieldDefinition $field, ModuleNames $names): ?string
+    {
+        return null;
+    }
+
+    public function isFile(): bool
+    {
+        return false;
     }
 }

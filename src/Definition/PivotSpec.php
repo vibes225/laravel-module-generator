@@ -14,6 +14,7 @@ final readonly class PivotSpec
         public bool $timestamps,
         public array $fields,
         public ?string $module,
+        public ?string $model = null,
     ) {}
 
     /** @param  array<string, mixed>  $data */
@@ -25,6 +26,7 @@ final readonly class PivotSpec
             $data['timestamps'],
             array_map(FieldDefinition::fromArray(...), $data['fields']),
             $data['module'],
+            $data['model'] ?? null,
         );
     }
 
@@ -37,6 +39,7 @@ final readonly class PivotSpec
             'timestamps' => $this->timestamps,
             'fields' => array_map(fn (FieldDefinition $field) => $field->toArray(), $this->fields),
             'module' => $this->module,
+            'model' => $this->model,
         ];
     }
 }

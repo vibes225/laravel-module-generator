@@ -48,7 +48,7 @@ final class DefinitionNormalizer
             'slug' => $input['slug'] ?? (is_string($table) ? str_replace('_', '-', $table) : null),
             'icon' => $input['icon'] ?? 'folder',
             'menu' => $this->menu($input['menu'] ?? []),
-            'options' => $this->options($input['options'] ?? [], $fields),
+            'options' => $this->options($input['options'] ?? [], $fields, ($input['tree'] ?? false) === true),
             'fields' => $fields,
             'relations' => array_map(fn ($relation) => $this->relation($relation, $model), $this->list($input['relations'] ?? [])),
             'tree' => $input['tree'] ?? false,
@@ -113,7 +113,7 @@ final class DefinitionNormalizer
      * @param  list<mixed>  $fields
      * @return array<string, mixed>
      */
-    private function options(mixed $options, array $fields): array
+    private function options(mixed $options, array $fields, bool $tree): array
     {
         $options = is_array($options) ? $options : [];
         $sort = is_array($options['default_sort'] ?? null) ? $options['default_sort'] : [];
@@ -122,7 +122,7 @@ final class DefinitionNormalizer
             'soft_deletes' => $options['soft_deletes'] ?? false,
             'per_page' => $options['per_page'] ?? 15,
             'default_sort' => [
-                'field' => $sort['field'] ?? $this->firstSortable($fields),
+                'field' => $sort['field'] ?? ($tree ? '_lft' : $this->firstSortable($fields)),
                 'direction' => $sort['direction'] ?? 'asc',
             ] + array_diff_key($sort, ['field' => 1, 'direction' => 1]),
         ];
@@ -227,6 +227,7 @@ final class DefinitionNormalizer
             'timestamps' => $pivot['timestamps'] ?? false,
             'fields' => array_map(fn ($field) => $this->field($field, pivot: true), $this->list($pivot['fields'] ?? [])),
             'module' => $pivot['module'] ?? null,
+            'model' => $pivot['model'] ?? null,
         ];
 
         return $normalized + array_diff_key($pivot, $normalized);
@@ -304,9 +305,11 @@ final class DefinitionNormalizer
         $derive = $polymorphic !== true && is_string($model) && $model !== '';
         $normalized = [
             'model' => $model,
+            'table' => $side['table'] ?? ($derive ? $this->inflector->table($model) : null),
             'foreign_key' => $side['foreign_key'] ?? ($derive ? Str::snake($model).'_id' : null),
             'on_delete' => $side['on_delete'] ?? 'cascade',
             'polymorphic' => $polymorphic,
+            'display' => $side['display'] ?? 'name',
         ];
 
         return $normalized + array_diff_key($side, $normalized);

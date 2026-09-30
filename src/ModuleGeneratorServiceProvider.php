@@ -4,10 +4,23 @@ declare(strict_types=1);
 
 namespace Amon\ModuleGenerator;
 
+use Amon\ModuleGenerator\Definition\DefinitionFactory;
 use Amon\ModuleGenerator\Definition\DefinitionNormalizer;
 use Amon\ModuleGenerator\Fields\FieldTypeRegistry;
+use Amon\ModuleGenerator\Generation\DefaultGenerators;
+use Amon\ModuleGenerator\Generation\Formatting\ProcessFormatter;
+use Amon\ModuleGenerator\Generation\GenerationSettings;
+use Amon\ModuleGenerator\Generation\ModuleGenerator;
+use Amon\ModuleGenerator\Generation\PlanExecutor;
+use Amon\ModuleGenerator\Generation\PlanInspector;
 use Amon\ModuleGenerator\Manifest\ManifestRepository;
 use Amon\ModuleGenerator\Naming\Inflector;
+use Amon\ModuleGenerator\Registry\ModuleRegistry;
+use Amon\ModuleGenerator\Stubs\StubRenderer;
+use Amon\ModuleGenerator\Stubs\StubResolver;
+use Amon\ModuleGenerator\Support\LaravelVersion;
+use Amon\ModuleGenerator\Support\PackageVersion;
+use DateTimeImmutable;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
 
@@ -33,6 +46,51 @@ class ModuleGeneratorServiceProvider extends ServiceProvider
 
         $this->app->singleton(ManifestRepository::class, fn (Application $app) => new ManifestRepository(
             rtrim((string) $app['config']->get('module-generator.manifest_path', base_path('.module-generator')), '/')
+        ));
+
+        $this->app->singleton(ModuleRegistry::class);
+
+        $this->app->singleton(StubRenderer::class, fn (Application $app) => new StubRenderer(new StubResolver(
+            dirname(__DIR__).'/stubs',
+            $app['config']->get('module-generator.stubs_path'),
+            LaravelVersion::major($app->version()),
+        )));
+
+        $this->app->singleton(ModuleGenerator::class, fn (Application $app) => new ModuleGenerator(
+            DefaultGenerators::all(),
+            $app->make(FieldTypeRegistry::class),
+            $app->make(StubRenderer::class),
+        ));
+
+        $this->app->singleton(PlanInspector::class, fn (Application $app) => new PlanInspector(
+            base_path(),
+            $app->make(ModuleRegistry::class),
+        ));
+
+        $this->app->singleton(PlanExecutor::class, fn (Application $app) => new PlanExecutor(
+            base_path(),
+            $app->make(ManifestRepository::class),
+            new ProcessFormatter(
+                (bool) $app['config']->get('module-generator.format.pint', true),
+                (bool) $app['config']->get('module-generator.format.prettier', false),
+            ),
+            ['generator' => PackageVersion::get(), 'laravel' => $app->version(), 'php' => PHP_VERSION],
+        ));
+
+        $this->app->singleton(ModuleService::class, fn (Application $app) => new ModuleService(
+            $app->make(DefinitionNormalizer::class),
+            $app->make(DefinitionFactory::class),
+            $app->make(ModuleGenerator::class),
+            $app->make(ModuleRegistry::class),
+            $app->make(ManifestRepository::class),
+            $app->make(PlanInspector::class),
+            $app->make(PlanExecutor::class),
+            fn () => new GenerationSettings(
+                (string) $app['config']->get('module-generator.convention', 'breeze'),
+                LaravelVersion::major($app->version()),
+                (string) $app['config']->get('module-generator.naming.models_namespace', 'App\Models'),
+                new DateTimeImmutable,
+            ),
         ));
     }
 

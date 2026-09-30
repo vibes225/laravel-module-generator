@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Amon\ModuleGenerator\Contracts;
 
+use Amon\ModuleGenerator\Definition\FieldDefinition;
+use Amon\ModuleGenerator\Generation\ModuleNames;
+
 /**
  * Contrat unique des types de champs. Phase 3 : identité, schéma d'options exposé à l'UI, validation.
  * Les méthodes de génération (colonne, cast, règles, composants) s'y ajouteront aux phases 6 et 7.
@@ -60,4 +63,58 @@ interface FieldType
      * @param  array<string, mixed>  $options
      */
     public function validateDefault(mixed $value, array $options): ?string;
+
+    // --- Génération (phases 6 et 7). Tout le code produit est autonome : aucune référence au package.
+
+    /** Colonne de migration sans `;` : `$table->string('name', 100)->nullable()->unique()`. */
+    public function migrationColumn(FieldDefinition $field): string;
+
+    /** Expression PHP du cast Eloquent (`'boolean'`, `InvoiceStatus::class`), ou null. */
+    public function cast(FieldDefinition $field, ModuleNames $names): ?string;
+
+    /**
+     * Règles de validation (expressions PHP), présence (required/nullable) comprise.
+     *
+     * @return list<string>
+     */
+    public function rules(FieldDefinition $field, ModuleNames $names, bool $update): array;
+
+    /**
+     * Classes utilisées par le cast, les règles et la factory.
+     *
+     * @return list<string>
+     */
+    public function imports(FieldDefinition $field, ModuleNames $names): array;
+
+    /** Expression PHP de la valeur de factory. */
+    public function factoryValue(FieldDefinition $field, ModuleNames $names): string;
+
+    /** Nom du fragment de formulaire (`stubs/fragments/form/<nom>.stub`). */
+    public function formFragment(FieldDefinition $field): string;
+
+    /**
+     * Variables propres au fragment (en plus de NAME, LABEL, REQUIRED), déjà échappées pour du JSX.
+     *
+     * @return array<string, string>
+     */
+    public function formVariables(FieldDefinition $field): array;
+
+    /** Valeur initiale JavaScript du champ dans le formulaire (`record` = enregistrement édité ou null). */
+    public function formInitial(FieldDefinition $field): string;
+
+    /** Expression JSX d'affichage (tableau, fiche) ; `$variable` vaut `row` ou `record`. */
+    public function display(FieldDefinition $field, string $variable): string;
+
+    /**
+     * Fonctions du kit utilisées par display() (`formatDate`, `Badge`...).
+     *
+     * @return list<string>
+     */
+    public function displayImports(FieldDefinition $field): array;
+
+    /** Expression PHP des options [{value, label}] (selects, filtres), ou null pour les valeurs distinctes en base. */
+    public function optionsExpression(FieldDefinition $field, ModuleNames $names): ?string;
+
+    /** Le champ est-il un fichier (formulaire multipart, stockage) ? */
+    public function isFile(): bool;
 }

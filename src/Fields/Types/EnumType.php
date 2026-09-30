@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Amon\ModuleGenerator\Fields\Types;
 
+use Amon\ModuleGenerator\Definition\FieldDefinition;
 use Amon\ModuleGenerator\Fields\AbstractFieldType;
+use Amon\ModuleGenerator\Generation\ModuleNames;
 use Illuminate\Support\Str;
 
 /**
@@ -80,5 +82,56 @@ final class EnumType extends AbstractFieldType
         $values = array_column($options['values'] ?? [], 'value');
 
         return is_string($value) && in_array($value, $values, true) ? null : 'La valeur par défaut doit faire partie des valeurs.';
+    }
+
+    // --- Génération : la colonne est une chaîne, le modèle caste vers une enum PHP propre au module.
+
+    protected string $fragment = 'select';
+
+    public function enumClass(FieldDefinition $field, ModuleNames $names): string
+    {
+        return sprintf('App\Enums\%s', $names->enumClass($field->name));
+    }
+
+    public function cast(FieldDefinition $field, ModuleNames $names): string
+    {
+        return $names->enumClass($field->name).'::class';
+    }
+
+    protected function typeRules(FieldDefinition $field, ModuleNames $names): array
+    {
+        return ['Rule::enum('.$names->enumClass($field->name).'::class)'];
+    }
+
+    public function imports(FieldDefinition $field, ModuleNames $names): array
+    {
+        return [$this->enumClass($field, $names), 'Illuminate\Validation\Rule'];
+    }
+
+    protected function factoryExpression(FieldDefinition $field, ModuleNames $names): string
+    {
+        return 'fake()->randomElement('.$names->enumClass($field->name).'::cases())';
+    }
+
+    public function formVariables(FieldDefinition $field): array
+    {
+        return ['PROPS' => '', 'OPTIONS' => $field->name];
+    }
+
+    public function display(FieldDefinition $field, string $variable): string
+    {
+        $value = "{$variable}.{$field->name}";
+
+        return "{$value} ? <Badge>{optionLabel(options.{$field->name}, {$value})}</Badge> : '—'";
+    }
+
+    public function displayImports(FieldDefinition $field): array
+    {
+        return ['Badge', 'optionLabel'];
+    }
+
+    public function optionsExpression(FieldDefinition $field, ModuleNames $names): string
+    {
+        return $names->enumClass($field->name).'::options()';
     }
 }

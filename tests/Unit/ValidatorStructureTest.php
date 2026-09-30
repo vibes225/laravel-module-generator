@@ -20,7 +20,7 @@ it('accepte les quatre types de relations', function () {
         ['type' => 'hasOne', 'target' => 'Receipt'],
         ['type' => 'hasMany', 'target' => 'InvoiceLine'],
         ['type' => 'belongsToMany', 'target' => 'Tag'],
-        ['type' => 'belongsToMany', 'target' => 'Label', 'pivot' => ['mode' => 'module', 'module' => 'invoice-labels']],
+        ['type' => 'belongsToMany', 'target' => 'Label', 'pivot' => ['mode' => 'module', 'module' => 'invoice-labels', 'model' => 'InvoiceLabel', 'table' => 'invoice_label']],
     ]]));
 });
 
@@ -47,6 +47,7 @@ it('signale les erreurs de pivot de relation', function (array $input, string $p
     'mode inconnu' => fn () => [withPivot(['mode' => 'auto']), 'pivot.mode'],
     'champs sans table' => fn () => [withPivot(['fields' => [['name' => 'role', 'type' => 'string']]]), 'pivot.mode'],
     'module manquant' => fn () => [withPivot(['mode' => 'module']), 'pivot.module'],
+    'module non résolu' => fn () => [withPivot(['mode' => 'module', 'module' => 'invoice-tags']), 'pivot.module'],
     'table du module' => fn () => [withPivot(['mode' => 'generate', 'table' => 'invoices']), 'pivot.table'],
     'clés identiques' => fn () => [withPivot([], ['target' => 'Invoice', 'related_pivot_key' => 'invoice_id']), 'related_pivot_key'],
     'password' => fn () => [withPivot(['mode' => 'generate', 'fields' => [['name' => 'secret', 'type' => 'password']]]), 'pivot.fields.0.type'],
@@ -93,6 +94,7 @@ it('valide un module pivot', function () {
     expectInvalid(pivotInput(['right' => ['model' => 'Tag', 'foreign_key' => 'client_id']]), 'pivot.right.foreign_key');
     expectInvalid(pivotInput(['left' => ['polymorphic' => true], 'right' => ['polymorphic' => true]], $morph), 'pivot');
     expectInvalid(pivotInput(['right' => ['polymorphic' => true]]), 'morph');
+    expectInvalid(pivotInput(['right' => ['polymorphic' => true], 'primary_id' => false], $morph), 'pivot.primary_id');
     expectInvalid(pivotInput(overrides: $morph), 'morph');
     expectInvalid(pivotInput(overrides: ['fields' => [['name' => 'tag_id', 'type' => 'integer']]]), 'fields.0.name');
     expectInvalid(clientInput(['pivot' => ['left' => []]]), 'pivot');
@@ -108,7 +110,7 @@ it('accepte un pivot auto-référent avec des clés distinctes', function () {
 it('autorise la sélection multiple belongsToMany sans champs pivot', function () {
     expectValid(withPivot(['mode' => 'none'], ['in_form' => true]));
     expectValid(withPivot(['mode' => 'generate', 'timestamps' => true], ['in_form' => true, 'display' => 'label']));
-    expectValid(withPivot(['mode' => 'module', 'module' => 'invoice-tags'], ['in_form' => true]));
+    expectValid(withPivot(['mode' => 'module', 'module' => 'invoice-tags', 'model' => 'InvoiceTag', 'table' => 'invoice_tag'], ['in_form' => true]));
     expectInvalid(withPivot(['mode' => 'generate', 'fields' => [['name' => 'role', 'type' => 'string']]], ['in_form' => true]), 'relations.0.in_form');
     expectInvalid(withPivot(['mode' => 'none'], ['in_form' => true, 'display' => 'Label']), 'relations.0.display');
 });

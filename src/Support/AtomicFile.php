@@ -13,8 +13,16 @@ final class AtomicFile
     {
         $directory = dirname($path);
 
-        if (! is_dir($directory) && ! @mkdir($directory, 0777, true) && ! is_dir($directory)) {
-            throw new RuntimeException("Impossible de créer le dossier {$directory}.");
+        if (! is_dir($directory)) {
+            for ($ancestor = $directory; $ancestor !== dirname($ancestor); $ancestor = dirname($ancestor)) {
+                if (file_exists($ancestor) && ! is_dir($ancestor)) {
+                    throw new RuntimeException("Impossible de créer le dossier {$directory} : {$ancestor} est un fichier.");
+                }
+            }
+
+            if (! mkdir($directory, 0777, true) && ! is_dir($directory)) {
+                throw new RuntimeException("Impossible de créer le dossier {$directory}.");
+            }
         }
 
         $temporary = $directory.DIRECTORY_SEPARATOR.'.'.basename($path).'.'.bin2hex(random_bytes(4)).'.tmp';

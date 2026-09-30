@@ -1,0 +1,57 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+%%IMPORTS%%
+
+/**
+ * Module pivot sans colonne id : un enregistrement est identifié par son couple de clés.
+ * Pas de fiche ni de modification : supprimer puis recréer le lien.
+ */
+class %%CLASS%% extends Controller
+{
+    public function index(Request $request): Response
+    {
+        $filter = new %%FILTER%%($request);
+
+        return Inertia::render('%%PAGE_INDEX%%', [
+            'records' => $filter->paginate(%%MODEL%%::query()%%INDEX_QUERY%%),
+            'filters' => $filter->state(),
+            'options' => $this->options(),
+        ]);
+    }
+
+    public function create(): Response
+    {
+        return Inertia::render('%%PAGE_CREATE%%', [
+            'options' => $this->options(),
+        ]);
+    }
+
+    public function store(%%STORE_REQUEST%% $request): RedirectResponse
+    {
+        %%MODEL%%::create($request->validated());
+
+        return to_route('%%ROUTE%%.index')->with('success', 'Enregistrement créé.');
+    }
+
+    public function destroy(int $%%LEFT_PARAMETER%%, int $%%RIGHT_PARAMETER%%): RedirectResponse
+    {
+        %%MODEL%%::query()
+            ->where('%%LEFT_KEY%%', $%%LEFT_PARAMETER%%)
+            ->where('%%RIGHT_KEY%%', $%%RIGHT_PARAMETER%%)
+            ->delete();
+
+        return to_route('%%ROUTE%%.index')->with('success', 'Enregistrement supprimé.');
+    }
+
+    /**
+     * Options des listes : formulaires, filtres et libellés.
+     *
+     * @return array<string, mixed>
+     */
+    private function options(): array
+    {
+        return %%OPTIONS%%;
+    }
+}
