@@ -14,7 +14,7 @@ it('contient les composants du kit', function () {
     expect($names)->toContain(
         'AdminLayout', 'Sidebar', 'Header', 'Breadcrumb', 'DataTable', 'Pagination', 'Filters',
         'Modal', 'ConfirmDialog', 'Input', 'Select', 'Textarea', 'Checkbox', 'Switch', 'DatePicker',
-        'Button', 'Badge', 'EmptyState', 'icons', 'format', 'index',
+        'Button', 'Badge', 'EmptyState', 'MultiSelect', 'icons', 'format', 'index',
     );
 });
 

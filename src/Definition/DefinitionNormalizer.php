@@ -201,7 +201,7 @@ final class DefinitionNormalizer
             },
             'nullable' => $nullable,
             'on_delete' => $relation['on_delete'] ?? ($type === 'belongsTo' ? ($nullable === true ? 'null' : 'restrict') : null),
-            'display' => $relation['display'] ?? ($type === 'belongsTo' ? 'name' : null),
+            'display' => $relation['display'] ?? (in_array($type, ['belongsTo', 'belongsToMany'], true) ? 'name' : null),
             'in_table' => $relation['in_table'] ?? ($type === 'belongsTo'),
             'in_form' => $relation['in_form'] ?? ($type === 'belongsTo'),
             'foreign_pivot_key' => $relation['foreign_pivot_key'] ?? ($type === 'belongsToMany' && $own !== null ? $own.'_id' : null),

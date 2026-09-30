@@ -12,6 +12,7 @@ export { default as Header } from './Header';
 export { default as Icon, icons } from './icons';
 export { default as Input } from './Input';
 export { default as Modal } from './Modal';
+export { default as MultiSelect } from './MultiSelect';
 export { default as Pagination } from './Pagination';
 export { default as Select } from './Select';
 export { default as Sidebar } from './Sidebar';

@@ -104,3 +104,17 @@ it('accepte un pivot auto-référent avec des clés distinctes', function () {
         'right' => ['model' => 'User', 'foreign_key' => 'followed_id'],
     ]));
 });
+
+it('autorise la sélection multiple belongsToMany sans champs pivot', function () {
+    expectValid(withPivot(['mode' => 'none'], ['in_form' => true]));
+    expectValid(withPivot(['mode' => 'generate', 'timestamps' => true], ['in_form' => true, 'display' => 'label']));
+    expectValid(withPivot(['mode' => 'module', 'module' => 'invoice-tags'], ['in_form' => true]));
+    expectInvalid(withPivot(['mode' => 'generate', 'fields' => [['name' => 'role', 'type' => 'string']]], ['in_form' => true]), 'relations.0.in_form');
+    expectInvalid(withPivot(['mode' => 'none'], ['in_form' => true, 'display' => 'Label']), 'relations.0.display');
+});
+
+it('laisse la sélection multiple désactivée par défaut', function () {
+    $relation = normalizeDefinition(withPivot(['mode' => 'none']))['relations'][0];
+
+    expect($relation['in_form'])->toBeFalse()->and($relation['display'])->toBe('name');
+});

@@ -461,8 +461,8 @@ final class DefinitionValidator
         $this->bool($relation, 'in_table', "{$path}.in_table");
         $this->bool($relation, 'in_form', "{$path}.in_form");
 
-        if ($type !== RelationType::BelongsTo && ($relation['in_form'] ?? false) === true) {
-            $this->add("{$path}.in_form", 'Seules les relations belongsTo ont un champ de formulaire.');
+        if (in_array($type, [RelationType::HasOne, RelationType::HasMany], true) && ($relation['in_form'] ?? false) === true) {
+            $this->add("{$path}.in_form", 'Seules les relations belongsTo et belongsToMany ont un champ de formulaire.');
         }
 
         match ($type) {
@@ -500,7 +500,13 @@ final class DefinitionValidator
             $this->add("{$path}.related_pivot_key", 'Les deux clés du pivot doivent être différentes.');
         }
 
+        $this->snake($relation['display'] ?? null, "{$path}.display");
         $pivot = $relation['pivot'] ?? null;
+
+        // Sélection multiple : sync() des identifiants seuls, impossible si le pivot porte des champs à saisir.
+        if (($relation['in_form'] ?? false) === true && is_array($pivot) && ($pivot['fields'] ?? []) !== []) {
+            $this->add("{$path}.in_form", 'La sélection multiple n\'est pas disponible si le pivot a des champs supplémentaires (utiliser un module pivot).');
+        }
 
         if (! is_array($pivot)) {
             $this->add("{$path}.pivot", 'Options de pivot attendues.');
