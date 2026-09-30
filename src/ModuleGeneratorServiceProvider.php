@@ -6,7 +6,9 @@ namespace Amon\ModuleGenerator;
 
 use Amon\ModuleGenerator\Definition\DefinitionNormalizer;
 use Amon\ModuleGenerator\Fields\FieldTypeRegistry;
+use Amon\ModuleGenerator\Manifest\ManifestRepository;
 use Amon\ModuleGenerator\Naming\Inflector;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
 
 class ModuleGeneratorServiceProvider extends ServiceProvider
@@ -15,18 +17,22 @@ class ModuleGeneratorServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__.'/../config/module-generator.php', 'module-generator');
 
-        $this->app->singleton(FieldTypeRegistry::class, fn ($app) => FieldTypeRegistry::fromClasses(
+        $this->app->singleton(FieldTypeRegistry::class, fn (Application $app) => FieldTypeRegistry::fromClasses(
             $app['config']->get('module-generator.field_types', [])
         ));
 
-        $this->app->singleton(Inflector::class, fn ($app) => new Inflector(
+        $this->app->singleton(Inflector::class, fn (Application $app) => new Inflector(
             (bool) $app['config']->get('module-generator.naming.french_plural', false)
         ));
 
-        $this->app->singleton(DefinitionNormalizer::class, fn ($app) => new DefinitionNormalizer(
+        $this->app->singleton(DefinitionNormalizer::class, fn (Application $app) => new DefinitionNormalizer(
             $app->make(FieldTypeRegistry::class),
             $app->make(Inflector::class),
             (string) $app['config']->get('module-generator.naming.models_namespace', 'App\Models'),
+        ));
+
+        $this->app->singleton(ManifestRepository::class, fn (Application $app) => new ManifestRepository(
+            rtrim((string) $app['config']->get('module-generator.manifest_path', base_path('.module-generator')), '/')
         ));
     }
 
